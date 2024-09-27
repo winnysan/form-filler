@@ -1,7 +1,13 @@
-chrome.runtime.onInstalled.addListener(() =>
-  console.log("Form Filler has been installed")
-);
+chrome.runtime.onInstalled.addListener(() => {
+  console.log("Form Filler has been installed");
 
+  chrome.storage.sync.set({
+    name: "John Doe",
+    email: "johndoe@example.com",
+    password: "password",
+    confirmPassword: "password",
+  });
+});
 function executeFillForm(logMessage = false) {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.scripting.executeScript({
@@ -30,15 +36,15 @@ function fillForm(logMessage) {
     console.log("Filling the form...");
   }
 
-  const nameInput = document.querySelector('input[name="name"]');
-  const emailInput = document.querySelector('input[name="email"]');
-  const passwordInput = document.querySelector('input[name="password"]');
-  const confirmPasswordInput = document.querySelector(
-    'input[name="confirmPassword"]'
-  );
+  chrome.storage.sync.get(["name", "email", "password", "confirmPassword"], (data) => {
+    const nameInput = document.querySelector('input[name="name"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    const passwordInput = document.querySelector('input[name="password"]');
+    const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
 
-  if (nameInput) nameInput.value = "Marek";
-  if (emailInput) emailInput.value = "marek@example.com";
-  if (passwordInput) passwordInput.value = "password";
-  if (confirmPasswordInput) confirmPasswordInput.value = "password";
+    if (nameInput) nameInput.value = data.name || "John Doe";
+    if (emailInput) emailInput.value = data.email || "johndoe@example.com";
+    if (passwordInput) passwordInput.value = data.password || "password";
+    if (confirmPasswordInput) confirmPasswordInput.value = data.confirmPassword || "password";
+  });
 }
